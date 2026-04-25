@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocuNeat — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f5;
+    --cream: #f0ebe3;
+    --accent: #2d6a4f;
+    --accent2: #40916c;
+    --accent-light: #d8f3dc;
+    --gold: #b5943a;
+    --muted: #7a7169;
+    --border: #ddd5c8;
+    --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); font-family: 'DM Sans', sans-serif; color: var(--ink); display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--ink);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+  .sidebar-brand {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    position: relative;
+  }
+  .sidebar-brand::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 24px; right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent2), transparent);
+  }
+  .brand-mark {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent2), var(--gold));
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; color: #fff; font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .brand-name { color: #fff; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; }
+  .brand-sub { color: rgba(255,255,255,.35); font-size: 11px; font-weight: 300; margin-top: 2px; }
+  .sidebar-user {
+    margin: 20px 16px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 2px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--gold), var(--accent));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
+    flex-shrink: 0;
+  }
+  .user-name { color: #fff; font-size: 13px; font-weight: 500; }
+  .user-role { color: rgba(255,255,255,.35); font-size: 11px; }
+  .sidebar-nav { flex: 1; padding: 8px 12px; }
+  .nav-label { color: rgba(255,255,255,.25); font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 16px 12px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    color: rgba(255,255,255,.6); font-size: 13.5px;
+    padding: 10px 12px; border-radius: 2px;
+    text-decoration: none; cursor: pointer;
+    border: none; background: none; width: 100%;
+    text-align: left;
+    transition: background .15s, color .15s;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-item.active { background: rgba(64,145,108,.18); color: var(--accent-light); }
+  .nav-item .icon { width: 18px; text-align: center; font-size: 15px; }
+  .sidebar-footer {
+    padding: 16px 12px;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .logout-btn {
+    display: flex; align-items: center; gap: 10px;
+    color: rgba(255,255,255,.4); font-size: 13px;
+    padding: 10px 12px; border-radius: 2px;
+    text-decoration: none;
+    transition: color .15s, background .15s;
+  }
+  .logout-btn:hover { color: #e74c3c; background: rgba(231,76,60,.08); }
+
+  /* ── Main ── */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+  .topbar {
+    background: #fff;
+    border-bottom: 1.5px solid var(--border);
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar h2 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; }
+  .topbar-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .topbar-badge {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+    letter-spacing: .3px;
+  }
+
+  /* ── Content ── */
+  .content { padding: 32px; flex: 1; }
+  .grid { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+
+  /* ── Upload Card ── */
+  .card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+  }
+  .card-head {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-head-icon {
+    width: 36px; height: 36px;
+    background: var(--accent-light);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; color: var(--accent);
+  }
+  .card-head h3 { font-size: 15px; font-weight: 600; }
+  .card-head p { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .card-body { padding: 24px; }
+
+  /* ── Drop Zone ── */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 2px;
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+    background: var(--paper);
+  }
+  .dropzone:hover, .dropzone.drag-over { border-color: var(--accent2); background: rgba(64,145,108,.04); }
+  .dropzone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .dropzone-icon { font-size: 40px; margin-bottom: 12px; opacity: .4; }
+  .dropzone h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .dropzone p { font-size: 12px; color: var(--muted); }
+  .file-selected {
+    background: var(--accent-light);
+    border: 1.5px solid var(--accent2);
+    border-radius: 2px;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--accent);
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .file-selected.show { display: flex; }
+
+  /* ── Options Grid ── */
+  .opts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+  .opt-field label {
+    display: block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .opt-field select, .opt-field input[type=number] {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 2px;
+    padding: 9px 12px; font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+    background: var(--paper); color: var(--ink); outline: none;
+    transition: border-color .2s;
+  }
+  .opt-field select:focus, .opt-field input[type=number]:focus { border-color: var(--accent2); background: #fff; }
+
+  /* ── Checkboxes ── */
+  .checks { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .check-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; cursor: pointer;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border); border-radius: 2px;
+    background: var(--paper);
+    transition: border-color .2s, background .2s;
+  }
+  .check-item:hover { border-color: var(--accent2); background: #fff; }
+  .check-item input { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+  .check-item span { font-size: 12.5px; }
+
+  /* ── Format Button ── */
+  .format-btn {
+    width: 100%; background: var(--ink); color: #fff;
+    border: none; border-radius: 2px;
+    padding: 14px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-top: 20px;
+    position: relative; overflow: hidden;
+    transition: background .2s;
+    letter-spacing: .3px;
+  }
+  .format-btn::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent2));
+  }
+  .format-btn:hover { background: #16213e; }
+  .format-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── Progress ── */
+  .progress-area { display: none; margin-top: 16px; }
+  .progress-area.show { display: block; }
+  .progress-bar-wrap { background: var(--cream); border-radius: 20px; height: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--gold)); width: 0%; transition: width .4s; border-radius: 20px; }
+  .progress-label { font-size: 12px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  /* ── Result ── */
+  .result-area { display: none; }
+  .result-area.show { display: block; }
+  .result-card {
+    background: linear-gradient(135deg, rgba(45,106,79,.06), rgba(181,148,58,.04));
+    border: 1.5px solid var(--accent2);
+    border-radius: 2px; padding: 20px 22px; margin-top: 16px;
+  }
+  .result-card h4 { color: var(--accent); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .stat-row { display: flex; justify-content: space-between; font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid rgba(64,145,108,.1); }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-val { font-weight: 600; color: var(--accent); }
+  .download-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--accent); color: #fff;
+    text-decoration: none; border-radius: 2px;
+    padding: 11px 20px; font-size: 13.5px; font-weight: 600;
+    margin-top: 14px; transition: background .2s;
+  }
+  .download-btn:hover { background: #1b5437; }
+
+  /* ── Tips Sidebar ── */
+  .tips-card { background: var(--ink); }
+  .tips-card .card-head { border-bottom-color: rgba(255,255,255,.08); }
+  .tips-card .card-head h3 { color: #fff; }
+  .tips-card .card-head p { color: rgba(255,255,255,.4); }
+  .tips-card .card-head-icon { background: rgba(255,255,255,.08); color: rgba(255,255,255,.6); }
+  .tips-body { padding: 20px 24px; }
+  .tip-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .tip-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .tip-title { font-size: 12px; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+  .tip-text { font-size: 12px; color: rgba(255,255,255,.45); line-height: 1.6; }
+
+  /* ── History ── */
+  .history-section { margin-top: 28px; }
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; }
+  .del-all-btn {
+    background: none; border: 1.5px solid var(--border); border-radius: 2px;
+    color: var(--muted); font-size: 12px; font-family: 'DM Sans', sans-serif;
+    padding: 6px 12px; cursor: pointer; transition: border-color .2s, color .2s;
+  }
+  .del-all-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+  .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .history-table th {
+    background: var(--cream);
+    text-align: left; padding: 10px 14px;
+    font-size: 10.5px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1.5px solid var(--border);
+  }
+  .history-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-table tr:hover td { background: var(--paper); }
+  .fn { font-weight: 500; color: var(--ink); }
+  .fn-out { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .badge-opts { display: flex; flex-wrap: wrap; gap: 4px; }
+  .badge {
+    background: var(--cream); color: var(--muted);
+    font-size: 10.5px; padding: 2px 8px; border-radius: 20px;
+  }
+  .badge.green { background: var(--accent-light); color: var(--accent); }
+  .tbl-actions { display: flex; gap: 6px; }
+  .tbl-btn {
+    border: none; border-radius: 2px; padding: 6px 10px;
+    font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: opacity .15s;
+  }
+  .tbl-btn:hover { opacity: .75; }
+  .tbl-btn.dl { background: var(--accent-light); color: var(--accent); text-decoration: none; display: inline-flex; }
+  .tbl-btn.rm { background: #fdf0ef; color: #c0392b; }
+  .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+  .empty-state .icon { font-size: 36px; opacity: .3; margin-bottom: 10px; }
+
+  /* ── Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,26,46,.5); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: #fff; border: 1.5px solid var(--border); border-radius: 2px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+  .modal-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
+  .modal-head h4 { font-size: 15px; font-weight: 600; }
+  .modal-body { padding: 18px 24px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .modal-foot { padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); }
+  .modal-cancel {
+    background: none; border: 1.5px solid var(--border); border-radius: 2px;
+    padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    color: var(--muted);
+  }
+  .modal-cancel:hover { border-color: var(--ink); color: var(--ink); }
+  .modal-confirm {
+    background: #e74c3c; color: #fff; border: none; border-radius: 2px;
+    padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .modal-confirm:hover { background: #c0392b; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+  .toast-item {
+    background: var(--ink); color: #fff;
+    padding: 12px 18px; border-radius: 2px; font-size: 13px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    display: flex; align-items: center; gap: 10px;
+    animation: slideIn .3s ease;
+    border-left: 3px solid var(--accent2);
+  }
+  .toast-item.err { border-left-color: #e74c3c; }
+  @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">D</div>
+    <div class="brand-name">DocuNeat</div>
+    <div class="brand-sub">Perapih Laporan Word</div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar">{{ user[0].upper() }}</div>
+    <div>
+      <div class="user-name">{{ user }}</div>
+      <div class="user-role">Pengguna Aktif</div>
+    </div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" onclick="scrollTo(0,0)">
+      <span class="icon">📄</span> Format Dokumen
+    </button>
+    <button class="nav-item" onclick="document.querySelector('.history-section').scrollIntoView({behavior:'smooth'})">
+      <span class="icon">🕓</span> Riwayat
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <a href="/logout" class="logout-btn"><span>⬡</span> Keluar</a>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h2>Format Dokumen</h2>
+      <div class="topbar-sub">Upload file Word → rapihkan otomatis → unduh</div>
+    </div>
+    <span class="topbar-badge">✦ Aktif</span>
+  </div>
+
+  <div class="content">
+    <div class="grid">
+      <!-- Left: Formatter -->
+      <div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-icon">📑</div>
+            <div>
+              <h3>Upload Dokumen Word</h3>
+              <p>Format .docx yang berantakan → laporan rapi profesional</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Drop Zone -->
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="fileInput" accept=".docx">
+              <div class="dropzone-icon">📂</div>
+              <h4>Klik atau seret file di sini</h4>
+              <p>Hanya mendukung format <strong>.docx</strong> (Microsoft Word)</p>
+            </div>
+            <div class="file-selected" id="fileSelected">
+              <span>📄</span>
+              <span id="fileName">—</span>
+            </div>
+
+            <!-- Options -->
+            <div class="opts-grid">
+              <div class="opt-field">
+                <label>Jenis Huruf</label>
+                <select id="optFont">
+                  <option value="Times New Roman" selected>Times New Roman</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Calibri">Calibri</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Garamond">Garamond</option>
+                </select>
+              </div>
+              <div class="opt-field">
+                <label>Ukuran Huruf (pt)</label>
+                <input type="number" id="optFontSize" value="12" min="8" max="18">
+              </div>
+              <div class="opt-field">
+                <label>Spasi Baris</label>
+                <select id="optSpacing">
+                  <option value="1.0">Tunggal (1.0)</option>
+                  <option value="1.15">1.15</option>
+                  <option value="1.5" selected>1.5 (Standar)</option>
+                  <option value="2.0">Ganda (2.0)</option>
+                </select>
+              </div>
+              <div class="opt-field">
+                <label>Margin Halaman</label>
+                <select id="optMargin">
+                  <option value="narrow">Sempit (1.27 cm)</option>
+                  <option value="normal" selected>Normal (2.54 cm)</option>
+                  <option value="wide">Lebar (5 cm)</option>
+                  <option value="mirror">Mirror</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="checks">
+              <label class="check-item">
+                <input type="checkbox" id="chkHeadings" checked>
+                <span>🏷️ Deteksi & Rapikan Heading</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="chkSpacing" checked>
+                <span>↕️ Normalkan Jarak Paragraf</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="chkAlign" checked>
+                <span>⬛ Ratakan Teks (Justify)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="chkBlank" checked>
+                <span>🧹 Hapus Baris Kosong Ganda</span>
+              </label>
+              <label class="check-item" style="grid-column: 1 / -1;">
+                <input type="checkbox" id="chkPageNum" onchange="togglePnPos()">
+                <span>🔢 Tambah Nomor Halaman</span>
+              </label>
+            </div>
+            <!-- Page number position selector -->
+            <div id="pnPosWrap" style="display:none; margin-top:12px;">
+              <div class="opt-field">
+                <label>Posisi Nomor Halaman</label>
+                <select id="optPnPos">
+                  <option value="bottom_center">⬇ Bawah Tengah</option>
+                  <option value="bottom_right">↘ Bawah Kanan</option>
+                  <option value="top_right">↗ Kanan Atas</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-area" id="progressArea">
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" id="progressBar"></div>
+              </div>
+              <div class="progress-label" id="progressLabel">Sedang memformat dokumen…</div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-area" id="resultArea">
+              <div class="result-card">
+                <h4>✅ Dokumen Berhasil Dirapihkan</h4>
+                <div id="statRows"></div>
+                <a id="downloadLink" href="#" class="download-btn">⬇ Unduh Dokumen Rapi</a>
+              </div>
+            </div>
+
+            <button class="format-btn" id="formatBtn" onclick="submitFormat()">✦ Rapihkan Dokumen Sekarang</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Tips -->
+      <div>
+        <div class="card tips-card">
+          <div class="card-head">
+            <div class="card-head-icon">💡</div>
+            <div>
+              <h3>Panduan Penggunaan</h3>
+              <p>Tips untuk hasil terbaik</p>
+            </div>
+          </div>
+          <div class="tips-body">
+            <div class="tip-item">
+              <div class="tip-title">📌 Format yang Disupport</div>
+              <div class="tip-text">Hanya file <strong style="color:#d8f3dc">.docx</strong> (Word 2007+). Jika filenya .doc, buka di Word dan Save As .docx terlebih dahulu.</div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-title">🎯 Deteksi Heading Otomatis</div>
+              <div class="tip-text">Sistem mendeteksi "BAB I", teks HURUF KAPITAL, dan nama seksi umum seperti Pendahuluan, Metodologi, Daftar Pustaka, dll.</div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-title">📐 Standar Laporan Akademik</div>
+              <div class="tip-text">Pengaturan default mengikuti standar umum: Times New Roman 12pt, spasi 1.5, margin normal, teks rata kanan-kiri (justify).</div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-title">🔢 Nomor Halaman</div>
+              <div class="tip-text">Centang "Tambah Nomor Halaman" untuk menambahkan nomor halaman di tengah bawah secara otomatis.</div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-title">⚠️ Cadangkan File Asli</div>
+              <div class="tip-text">Selalu simpan salinan file asli sebelum memformat. File yang sudah dirapihkan tidak bisa dikembalikan ke format semula.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="history-section">
+      <div class="section-head">
+        <div class="section-title">Riwayat Format</div>
+        {% if history %}
+        <button class="del-all-btn" onclick="confirmDeleteAll()">🗑 Hapus Semua</button>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        {% if history %}
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Pengaturan</th>
+              <th>Waktu</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+          {% for h in history %}
+          <tr id="row-{{ h.id }}">
+            <td>
+              <div class="fn">{{ h.original }}</div>
+              <div class="fn-out">→ {{ h.output }}</div>
+            </td>
+            <td>
+              <div class="badge-opts">
+                <span class="badge green">{{ h.options.font }}</span>
+                <span class="badge green">{{ h.options.font_size }}pt</span>
+                <span class="badge">Spasi {{ h.options.line_spacing }}</span>
+                <span class="badge">Margin {{ h.options.margin }}</span>
+              </div>
+            </td>
+            <td>{{ h.timestamp }}</td>
+            <td>
+              <div class="tbl-actions">
+                <a href="/download/{{ h.output }}" class="tbl-btn dl">⬇</a>
+                <button class="tbl-btn rm" onclick="confirmDelete('{{ h.id }}')">✕</button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <div>Belum ada riwayat format. Upload dokumen pertama Anda!</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="delModal">
+  <div class="modal">
+    <div class="modal-head"><h4>Hapus Riwayat</h4></div>
+    <div class="modal-body">Yakin ingin menghapus riwayat ini? File hasil yang sudah diunduh tidak terpengaruh.</div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeModal('delModal')">Batal</button>
+      <button class="modal-confirm" id="delConfirmBtn">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="delAllModal">
+  <div class="modal">
+    <div class="modal-head"><h4>Hapus Semua Riwayat</h4></div>
+    <div class="modal-body">Yakin ingin menghapus <strong>semua</strong> riwayat Anda? Tindakan ini tidak dapat dibatalkan.</div>
+    <div class="modal-foot">
+      <button class="modal-cancel" onclick="closeModal('delAllModal')">Batal</button>
+      <button class="modal-confirm" onclick="deleteAll()">Hapus Semua</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastArea"></div>
+
+<script>
+  // ── State ─────────────────────────────────────────────────────
+  let selectedFile = null;
+
+  // ── Drop Zone ─────────────────────────────────────────────────
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const fileSelected = document.getElementById('fileSelected');
+  const fileName = document.getElementById('fileName');
+
+  // Click to browse
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) {
+      selectedFile = fileInput.files[0];
+      showFile(selectedFile.name);
+    }
+  });
+
+  // Drag over/leave
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('drag-over'); });
+  dropzone.addEventListener('dragleave', e => { e.stopPropagation(); dropzone.classList.remove('drag-over'); });
+
+  // Drop - save file reference directly, don't assign to input.files (read-only)
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.name.toLowerCase().endsWith('.docx')) {
+      selectedFile = f;
+      showFile(f.name);
+    } else {
+      showToast('Hanya file .docx yang diterima', true);
+    }
+  });
+
+  function togglePnPos() {
+    const checked = document.getElementById('chkPageNum').checked;
+    document.getElementById('pnPosWrap').style.display = checked ? 'block' : 'none';
+  }
+
+  function showFile(name) {
+    fileName.textContent = name;
+    fileSelected.classList.add('show');
+    document.getElementById('resultArea').classList.remove('show');
+    document.getElementById('progressArea').classList.remove('show');
+  }
+
+  // ── Format Submit ─────────────────────────────────────────────
+  async function submitFormat() {
+    if (!selectedFile) {
+      showToast('Pilih atau seret file .docx terlebih dahulu', true);
+      return;
+    }
+
+    const btn = document.getElementById('formatBtn');
+    const prog = document.getElementById('progressArea');
+    const bar = document.getElementById('progressBar');
+    const lbl = document.getElementById('progressLabel');
+    const result = document.getElementById('resultArea');
+
+    btn.disabled = true;
+    result.classList.remove('show');
+    prog.classList.add('show');
+    bar.style.width = '5%';
+    lbl.textContent = 'Menyiapkan dokumen…';
+
+    // Animate progress
+    const steps = [
+      [15, 'Membaca dokumen…'],
+      [40, 'Mendeteksi heading dan struktur…'],
+      [65, 'Menerapkan format dan font…'],
+      [85, 'Merapikan spasi dan margin…'],
+      [95, 'Menyimpan dokumen…'],
+    ];
+    let si = 0;
+    const tick = setInterval(() => {
+      if (si < steps.length) {
+        bar.style.width = steps[si][0] + '%';
+        lbl.textContent = steps[si][1];
+        si++;
+      }
+    }, 700);
+
+    // Use selectedFile (works for click AND drag-drop)
+    const fd = new FormData();
+    fd.append('file', selectedFile, selectedFile.name);
+    fd.append('font', document.getElementById('optFont').value);
+    fd.append('font_size', document.getElementById('optFontSize').value);
+    fd.append('line_spacing', document.getElementById('optSpacing').value);
+    fd.append('margin', document.getElementById('optMargin').value);
+    fd.append('fix_headings', document.getElementById('chkHeadings').checked ? 'true' : 'false');
+    fd.append('fix_spacing', document.getElementById('chkSpacing').checked ? 'true' : 'false');
+    fd.append('fix_alignment', document.getElementById('chkAlign').checked ? 'true' : 'false');
+    fd.append('remove_extra_blank', document.getElementById('chkBlank').checked ? 'true' : 'false');
+    fd.append('add_page_numbers', document.getElementById('chkPageNum').checked ? 'true' : 'false');
+    fd.append('page_number_position', document.getElementById('optPnPos').value);
+
+    try {
+      const res = await fetch('/format', { method: 'POST', body: fd });
+      clearInterval(tick);
+
+      let data;
+      try { data = await res.json(); }
+      catch(e) { throw new Error('Respons server tidak valid'); }
+
+      if (data.success) {
+        bar.style.width = '100%';
+        lbl.textContent = 'Selesai! Dokumen berhasil dirapihkan.';
+        setTimeout(() => {
+          prog.classList.remove('show');
+          showResult(data);
+          btn.disabled = false;
+        }, 600);
+      } else {
+        prog.classList.remove('show');
+        showToast(data.error || 'Gagal memformat dokumen', true);
+        btn.disabled = false;
+      }
+    } catch(e) {
+      clearInterval(tick);
+      prog.classList.remove('show');
+      showToast('Error: ' + e.message, true);
+      btn.disabled = false;
+    }
+  }
+
+  function showResult(data) {
+    const s = data.stats;
+    document.getElementById('statRows').innerHTML =
+      '<div class="stat-row"><span>Font diterapkan</span><span class="stat-val">' + s.font_changed + ' ' + s.font_size + 'pt</span></div>' +
+      '<div class="stat-row"><span>Paragraf diformat</span><span class="stat-val">' + s.paragraphs_formatted + ' paragraf</span></div>' +
+      '<div class="stat-row"><span>Heading terdeteksi</span><span class="stat-val">' + s.headings_detected + ' judul</span></div>' +
+      '<div class="stat-row"><span>Tetap rata kiri</span><span class="stat-val">' + (s.kept_left_align||0) + ' paragraf</span></div>' +
+      '<div class="stat-row"><span>Baris kosong dihapus</span><span class="stat-val">' + s.blank_paragraphs_removed + ' baris</span></div>';
+    document.getElementById('downloadLink').href = '/download/' + data.output;
+    document.getElementById('resultArea').classList.add('show');
+    showToast('Dokumen berhasil dirapihkan!');
+    setTimeout(() => location.reload(), 3500);
+  }
+
+  // ── Modal ──────────────────────────────────────────────────────
+  function confirmDelete(id) {
+    document.getElementById('delModal').classList.add('show');
+    document.getElementById('delConfirmBtn').onclick = () => deleteRow(id);
+  }
+
+  function confirmDeleteAll() {
+    document.getElementById('delAllModal').classList.add('show');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+
+  async function deleteRow(id) {
+    closeModal('delModal');
+    const res = await fetch('/history/delete/' + id, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      const row = document.getElementById('row-' + id);
+      if (row) row.remove();
+      showToast('Riwayat dihapus');
+    }
+  }
+
+  async function deleteAll() {
+    closeModal('delAllModal');
+    const res = await fetch('/history/delete-all', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      const tbody = document.getElementById('historyBody');
+      if (tbody) tbody.innerHTML = '';
+      showToast('Semua riwayat dihapus');
+      setTimeout(() => location.reload(), 1200);
+    }
+  }
+
+  // ── Toast ──────────────────────────────────────────────────────
+  function showToast(msg, err) {
+    const area = document.getElementById('toastArea');
+    const el = document.createElement('div');
+    el.className = 'toast-item' + (err ? ' err' : '');
+    el.textContent = (err ? '⚠ ' : '✓ ') + msg;
+    area.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+  });
+</script>
+</body>
+</html>

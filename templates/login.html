@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocuNeat — Masuk</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f5;
+    --cream: #f0ebe3;
+    --accent: #2d6a4f;
+    --accent2: #40916c;
+    --gold: #b5943a;
+    --muted: #7a7169;
+    --border: #ddd5c8;
+    --danger: #c0392b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(45,106,79,.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 90% 80%, rgba(181,148,58,.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  /* decorative lines */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 39px, rgba(45,106,79,.04) 40px
+    );
+    pointer-events: none;
+  }
+  .card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    width: 420px;
+    box-shadow: 0 4px 40px rgba(26,26,46,.08), 0 1px 0 var(--border);
+    position: relative;
+    z-index: 1;
+  }
+  .card-top {
+    background: var(--ink);
+    padding: 36px 40px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-top::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent2));
+  }
+  .logo-mark {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--accent2), var(--gold));
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 22px;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+  .card-top h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: #fff;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+  }
+  .card-top p { color: rgba(255,255,255,.5); font-size: 13px; font-weight: 300; }
+  .card-body { padding: 32px 40px 36px; }
+  .field { margin-bottom: 20px; }
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 2px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: var(--paper);
+    outline: none;
+    transition: border-color .2s;
+  }
+  input:focus { border-color: var(--accent2); background: #fff; }
+  .btn {
+    width: 100%;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background .2s, transform .1s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    transform: scaleX(0);
+    transition: transform .3s;
+  }
+  .btn:hover { background: #16213e; }
+  .btn:hover::after { transform: scaleX(1); }
+  .btn:active { transform: scale(.99); }
+  .error {
+    background: #fdf0ef;
+    border: 1px solid #f0bcb8;
+    border-left: 3px solid var(--danger);
+    color: var(--danger);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+  .hint { margin-top: 20px; text-align: center; font-size: 12px; color: var(--muted); }
+  .hint code { background: var(--cream); padding: 1px 6px; border-radius: 2px; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-top">
+    <div class="logo-mark">D</div>
+    <h1>DocuNeat</h1>
+    <p>Perapih Laporan Word Otomatis</p>
+  </div>
+  <div class="card-body">
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="POST">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Masukkan username" autofocus required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Masukkan password" required>
+      </div>
+      <button class="btn" type="submit">Masuk →</button>
+    </form>
+    <div class="hint">Default: <code>admin</code> / <code>admin123</code></div>
+  </div>
+</div>
+</body>
+</html>

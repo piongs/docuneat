@@ -1,0 +1,78 @@
+[
+  {
+    "id": "d5d8c761-1834-4be7-b985-50ec6c373b5a",
+    "user": "admin",
+    "original": "Laporan_MBG_Cibeber_2026.docx",
+    "output": "RAPIH_b3c8c260_Laporan_MBG_Cibeber_2026.docx",
+    "options": {
+      "font": "Times New Roman",
+      "font_size": 12,
+      "line_spacing": "1.5",
+      "margin": "normal",
+      "fix_headings": true,
+      "fix_spacing": true,
+      "fix_alignment": true,
+      "add_page_numbers": false,
+      "page_number_position": "bottom_center",
+      "remove_extra_blank": true
+    },
+    "timestamp": "21 Apr 2026, 10:50"
+  },
+  {
+    "id": "e586b43c-a298-4cc4-8782-98da15d44889",
+    "user": "admin",
+    "original": "TUGAS_06.docx",
+    "output": "RAPIH_1908aa78_TUGAS_06.docx",
+    "options": {
+      "font": "Times New Roman",
+      "font_size": 12,
+      "line_spacing": "1.5",
+      "margin": "normal",
+      "fix_headings": true,
+      "fix_spacing": true,
+      "fix_alignment": true,
+      "add_page_numbers": true,
+      "page_number_position": "top_right",
+      "remove_extra_blank": true
+    },
+    "timestamp": "21 Apr 2026, 10:40"
+  },
+  {
+    "id": "63fb8a2c-6216-464c-aecd-bb4f4853cedb",
+    "user": "admin",
+    "original": "nyoba.docx",
+    "output": "RAPIH_95c97713_nyoba.docx",
+    "options": {
+      "font": "Times New Roman",
+      "font_size": 12,
+      "line_spacing": "1.5",
+      "margin": "normal",
+      "fix_headings": true,
+      "fix_spacing": true,
+      "fix_alignment": true,
+      "add_page_numbers": true,
+      "page_number_position": "bottom_center",
+      "remove_extra_blank": true
+    },
+    "timestamp": "21 Apr 2026, 10:38"
+  },
+  {
+    "id": "c2d9c18e-60a8-4b52-ad71-68ed9a6c61b9",
+    "user": "admin",
+    "original": "Laporan_Digital_Forensik.docx",
+    "output": "RAPIH_b967bf59_Laporan_Digital_Forensik.docx",
+    "options": {
+      "font": "Times New Roman",
+      "font_size": 12,
+      "line_spacing": "1.5",
+      "margin": "normal",
+      "fix_headings": true,
+      "fix_spacing": true,
+      "fix_alignment": true,
+      "add_page_numbers": true,
+      "page_number_position": "bottom_right",
+      "remove_extra_blank": true
+    },
+    "timestamp": "21 Apr 2026, 00:11"
+  }
+]
