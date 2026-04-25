@@ -163,3 +163,16 @@ if __name__ == '__main__':
 # WAJIB tambahkan ini di baris paling bawah (di luar blok if) agar terbaca oleh Vercel
 app = app
 
+import os
+
+# Mencari lokasi folder api
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Gunakan ini untuk memanggil file JSON
+USERS_FILE = os.path.join(BASE_DIR, 'users.json')
+HISTORY_FILE = os.path.join(BASE_DIR, 'history.json')
+
+app = Flask(__name__, template_folder='../templates')
+
+
+
