@@ -7,6 +7,15 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from docx_formatter import format_document
+import os
+
+# Mencari lokasi folder api
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Gunakan ini untuk memanggil file JSON
+USERS_FILE = os.path.join(BASE_DIR, 'users.json')
+HISTORY_FILE = os.path.join(BASE_DIR, 'history.json')
+app = Flask(__name__, template_folder='../templates')
 
 app = Flask(__name__)
 app.secret_key = 'docuneat-secret-key-2024'
@@ -172,7 +181,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USERS_FILE = os.path.join(BASE_DIR, 'users.json')
 HISTORY_FILE = os.path.join(BASE_DIR, 'history.json')
 
-app = Flask(__name__, template_folder='../templates')
+
 
 
 
